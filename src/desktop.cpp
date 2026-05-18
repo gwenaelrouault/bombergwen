@@ -3,7 +3,7 @@
 #include <string>
 #include <memory>
 #include "game_engine.h"
-
+#include <syslog.h>
 
 int main(int argc, char **argv)
 {

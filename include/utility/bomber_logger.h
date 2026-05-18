@@ -6,25 +6,27 @@
 
 using namespace std;
 
-#define LOG_FILE_NAME   "bombergwen.log"
-#define LOGGER_NAME     "bomber_logger"
+#define LOG_FILE_NAME "bombergwen.log"
+#define LOGGER_NAME "bomber_logger"
 
 typedef shared_ptr<spdlog::logger> TBomberLogger;
 
-class BomberLogger {
+class BomberLogger
+{
 public:
-    BomberLogger() 
+    BomberLogger()
     {
         create_logger();
     }
     ~BomberLogger() {}
-    
-    static TBomberLogger get_instance() {
+
+    static TBomberLogger get_instance()
+    {
         return INSTANCE;
     }
 
     static bool create_logger();
+
 private:
     static TBomberLogger INSTANCE;
 };
-
