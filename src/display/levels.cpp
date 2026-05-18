@@ -14,7 +14,7 @@ void LevelTile::load_texture(BomberGraphicsRenderer *renderer)
 
 void LevelTile::draw(BomberGraphicsRenderer *renderer)
 {
-    cout << "DRAW TILE(" << _column << "," << _row << ")" << endl;
+    //cout << "DRAW TILE(" << _column << "," << _row << ")" << endl;
     renderer->draw(_texture.get(), _coords);
 }
 
@@ -70,12 +70,12 @@ void Level::init(BomberGraphicsRenderer *renderer)
 
 void Level::update(int elapsed_ms)
 {
-    cout << "update level" << _name << endl;
+    //cout << "update level" << _name << endl;
 }
 
 void Level::draw(BomberGraphicsRenderer *renderer)
 {
-    cout << "draw level(" << _name << ")" << endl;
+    //cout << "draw level(" << _name << ")" << endl;
     for (int i = 0; i < _tiles.size(); i++)
     {
         _tiles.at(i)->draw(renderer);

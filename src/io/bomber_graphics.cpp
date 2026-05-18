@@ -93,8 +93,9 @@ unique_ptr<BomberGraphicsRenderer> BomberGraphicsRenderer::create_renderer(int s
         return nullptr;
     }
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
-    SDL_Renderer *renderer = SDL_CreateRenderer(window,-1,
-    SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1,
+                                                SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    SDL_RenderSetIntegerScale(renderer, SDL_TRUE);
     if (!renderer)
     {
         BomberLogger::BomberLogger::get_instance()->error("%s", SDL_GetError());
@@ -108,7 +109,7 @@ BomberGraphicsRenderer::BomberGraphicsRenderer(SDL_Renderer *renderer, int scree
 {
     _renderer = renderer;
     _window = window;
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    // SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     _screen_width = screen_width;
     _screen_height = screen_height;
     _x_scale_factor = 1.0;
@@ -132,11 +133,12 @@ void BomberGraphicsRenderer::select_camera(BomberBBox *bbox)
     _y_scale_factor = (double)_screen_height / (double)bbox->get_dimensions().get_height();
     _screen_x_offset = _bbox.get_x() - _bbox.get_dimensions().get_width() / 2;
     _screen_y_offset = _bbox.get_y() - _bbox.get_dimensions().get_height() / 2;
+    /*
     BomberLogger::get_instance()->info("IO:GRAPHICS:select_camera(x={},y={},w={},h={})",
                                        _bbox.get_x(), _bbox.get_y(), _bbox.get_dimensions().get_width(), _bbox.get_dimensions().get_height());
     BomberLogger::get_instance()->info("IO:GRAPHICS:select_camera(x1={},y1={},x2={},y2={})",
                                        _bbox.get_rect().x1, _bbox.get_rect().y1, _bbox.get_rect().x2, _bbox.get_rect().y2);
-    BomberLogger::get_instance()->info("IO:GRAPHICS:select_camera(zoom={},{})", _x_scale_factor, _y_scale_factor);
+    BomberLogger::get_instance()->info("IO:GRAPHICS:select_camera(zoom={},{})", _x_scale_factor, _y_scale_factor);*/
 }
 
 void BomberGraphicsRenderer::clear()
@@ -175,7 +177,7 @@ void BomberGraphicsRenderer::draw(BomberTexture *texture, BomberCoordinates &coo
     box.y = (int)((double)screen_y1 * _y_scale_factor);
     box.w = (int)round((texture->get_width() * _x_scale_factor));
     box.h = (int)round((texture->get_height() * _y_scale_factor));
-    cout << "==> " << screen_x1 << "," << screen_y1 << "[" << _bbox.get_x() << "," << _bbox.get_y() << endl;
+    //cout << "==> " << screen_x1 << "," << screen_y1 << "[" << _bbox.get_x() << "," << _bbox.get_y() << endl;
     // BomberLogger::get_instance()->info("IO:GRAPHICS:draw texture({},{},{},{})", box.x, box.y, box.w, box.h);
     SDL_RenderCopy(_renderer, texture->get_texture(), NULL, &box);
 }

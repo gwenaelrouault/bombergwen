@@ -33,7 +33,6 @@ ostream &operator<<(std::ostream &os, const Sprite &s)
 void SpriteFrame::load_texture(BomberGraphicsRenderer *renderer)
 {
     _texture = renderer->load_texture(_img.get());
-    
 }
 
 void SpriteState::init(BomberGraphicsRenderer *renderer)
@@ -51,51 +50,56 @@ void Sprite::init(BomberGraphicsRenderer *renderer)
         auto state = state_it->second;
         state->init(renderer);
     }
-   // _box.x = 0;
-   // _box.y = 0;
+    // _box.x = 0;
+    // _box.y = 0;
 }
 
-void Sprite::move(int offset_x, int offset_y) {
+void Sprite::move(int offset_x, int offset_y)
+{
     _coords.set_x(_coords.get_x() + offset_x);
     _coords.set_y(_coords.get_y() + offset_y);
 }
 
-void Sprite::set_position(const BomberCoordinates& coords) {
+void Sprite::set_position(const BomberCoordinates &coords)
+{
     _coords = coords;
 }
 
 void Sprite::update(int elapsed_ms)
 {
     _current_elapsed_time += elapsed_ms;
-    cout << "CURRENT TIME : " << _current_elapsed_time << endl;
+    // cout << "CURRENT TIME : " << _current_elapsed_time << endl;
     auto current_frame = get_current_frame();
     if (current_frame != nullptr && _current_elapsed_time >= current_frame->get_duration())
     {
         int next_index = _current_index + 1;
         if (next_index < (int)_current_state->get_frames_nb())
         {
-            cout << "NEXT INDEX : " << next_index << endl;
+            // cout << "NEXT INDEX : " << next_index << endl;
             _current_index = next_index;
         }
         else if (_current_state->is_repeated())
         {
-             cout << "FIN ANIM IS REPET" << endl;
+            // cout << "FIN ANIM IS REPET" << endl;
             _current_index = 0;
         }
-        else {
-            cout << "FIN ANIM" << endl;
+        else
+        {
+            // cout << "FIN ANIM" << endl;
         }
         _current_elapsed_time = 0;
     }
 }
 
-void Sprite::draw(BomberGraphicsRenderer *renderer) {
-    cout << "draw sprite(" << _name << ")" << endl;
-    if (get_current_frame() != nullptr)  {
-       renderer->draw(get_current_frame()->get_texture().get(),_coords);
+void Sprite::draw(BomberGraphicsRenderer *renderer)
+{
+    //cout << "draw sprite(" << _name << ")" << endl;
+    if (get_current_frame() != nullptr)
+    {
+        renderer->draw(get_current_frame()->get_texture().get(), _coords);
     }
-    //if (get_current_frame() != nullptr) cout <<"ERRREUR NULL" << endl;
-    //SDL_RenderCopy(renderer, , NULL, &_box);
+    // if (get_current_frame() != nullptr) cout <<"ERRREUR NULL" << endl;
+    // SDL_RenderCopy(renderer, , NULL, &_box);
 }
 
 void Sprite::set_current_state(const string &name)
@@ -112,10 +116,10 @@ void Sprite::set_current_state(const string &name)
             _current_elapsed_time = 0;
             //_box.w = _current_state->get_frame(0)->get_width() * 2;
             //_box.h = _current_state->get_frame(0)->get_height() *2 ;
-            //cout << "->change state " << _current_state->get_name() 
+            // cout << "->change state " << _current_state->get_name()
             //    << ":" <<  current_name
-             //   << ",box=[" <<  _box.w << "," << _box.h << "," << _box.x << "," << _box.y << "]"
-            // << endl;  
+            //   << ",box=[" <<  _box.w << "," << _box.h << "," << _box.x << "," << _box.y << "]"
+            // << endl;
         }
     }
     else
