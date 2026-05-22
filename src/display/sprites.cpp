@@ -1,5 +1,5 @@
 #include "sprites.h"
-#include <syslog.h>
+#include "bomber_logger.h"
 
 ostream &operator<<(std::ostream &os, const SpriteFrame &f)
 {
@@ -54,8 +54,8 @@ void Sprite::init(BomberGraphicsRenderer *renderer)
 
 void Sprite::move(int offset_x, int offset_y)
 {
-    _coords.set_x(_coords.get_x() + (double) offset_x);
-    _coords.set_y(_coords.get_y() + (double) offset_y);
+    _coords.set_x(_coords.get_x() + (double)offset_x);
+    _coords.set_y(_coords.get_y() + (double)offset_y);
 }
 
 void Sprite::set_position(const BomberCoordinates &coords)
@@ -102,21 +102,15 @@ void Sprite::set_current_state(const string &name)
         if (_current_state == nullptr || new_state->get_name() != _current_state->get_name())
         {
             string current_name = _current_state == nullptr ? "" : _current_state->get_name();
-            syslog(LOG_INFO, "SPRITE:change state %s->%s", current_name.c_str(), new_state->get_name().c_str());
+            BomberLogger::get_instance()->info("SPRITE:change state {}->{}", current_name.c_str(), new_state->get_name().c_str());
             _current_state = new_state;
             _current_index = 0;
             _current_elapsed_time = 0;
-            //_box.w = _current_state->get_frame(0)->get_width() * 2;
-            //_box.h = _current_state->get_frame(0)->get_height() *2 ;
-            // cout << "->change state " << _current_state->get_name()
-            //    << ":" <<  current_name
-            //   << ",box=[" <<  _box.w << "," << _box.h << "," << _box.x << "," << _box.y << "]"
-            // << endl;
         }
     }
     else
     {
-        syslog(LOG_INFO, "SPRITE:ERROR STATE");
+        BomberLogger::get_instance()->error("SPRITE:cannot set state {}", name);
     }
 }
 
