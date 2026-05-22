@@ -2,15 +2,15 @@
 
 #include "levels.h"
 #include "sprites.h"
-#include "game_entity.h"
+#include "hero.h"
 #include "bomber_exceptions.h"
+#include "bomber_input.h"
 
 class NoLevelException : public BomberException
 {
 public:
     NoLevelException(const std::string &msg) : BomberException(msg) {}
 };
-
 
 class World
 {
@@ -19,20 +19,22 @@ public:
     ~World() {}
 
     void load(shared_ptr<SpritesRepository> sprites, shared_ptr<LevelsRepository> levels);
-    void select_level(const string &name, BomberGraphicsRenderer* renderer);
+
+    void select_level(const string &name, BomberGraphicsRenderer *renderer);
+
     void init(BomberGraphicsRenderer *renderer);
-    void update(int elapsed_ms);
+
+    void update(BomberGraphicsRenderer *renderer, int elapsed_ms);
+
     void draw(BomberGraphicsRenderer *renderer);
 
-    void on_UP(BomberGraphicsRenderer *renderer);
-    void on_DOWN(BomberGraphicsRenderer *renderer);
-    void on_RIGHT(BomberGraphicsRenderer *renderer);
-    void on_LEFT(BomberGraphicsRenderer *renderer);
+    void on_event(T_BomberKeyEvent event);
 
 private:
     shared_ptr<SpritesRepository> _sprites;
     shared_ptr<LevelsRepository> _levels;
     shared_ptr<Level> _selected_level;
-    shared_ptr<Hero> _hero;
+    shared_ptr<MainHero> _hero;
+    vector<shared_ptr<Hero>> _ennemies;
     vector<shared_ptr<Entity>> _entities;
 };

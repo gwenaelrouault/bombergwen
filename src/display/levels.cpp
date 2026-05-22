@@ -68,9 +68,11 @@ void Level::init(BomberGraphicsRenderer *renderer)
     BomberLogger::get_instance()->info("GAME:ENGINE:LEVEL:{}:init(loaded={} bytes) - END", _name, mem_size_bytes);
 }
 
-void Level::update(int elapsed_ms)
+bool Level::update(int elapsed_ms)
 {
+    (void) elapsed_ms;
     //cout << "update level" << _name << endl;
+    return false;
 }
 
 void Level::draw(BomberGraphicsRenderer *renderer)

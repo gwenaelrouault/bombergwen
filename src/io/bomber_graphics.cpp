@@ -10,7 +10,7 @@ void BomberBBox::set_position(const BomberCoordinates &coords)
     compute_rect();
 }
 
-void BomberBBox::set_dimension(int width, int height)
+void BomberBBox::set_dimension(double width, double height)
 {
     _dimensions.set_width(width);
     _dimensions.set_height(height);
@@ -92,10 +92,10 @@ unique_ptr<BomberGraphicsRenderer> BomberGraphicsRenderer::create_renderer(int s
         BomberLogger::BomberLogger::get_instance()->error("%s", SDL_GetError());
         return nullptr;
     }
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1,
                                                 SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    SDL_RenderSetIntegerScale(renderer, SDL_TRUE);
+    SDL_RenderSetIntegerScale(renderer, SDL_FALSE);
     if (!renderer)
     {
         BomberLogger::BomberLogger::get_instance()->error("%s", SDL_GetError());
@@ -114,8 +114,8 @@ BomberGraphicsRenderer::BomberGraphicsRenderer(SDL_Renderer *renderer, int scree
     _screen_height = screen_height;
     _x_scale_factor = 1.0;
     _y_scale_factor = 1.0;
-    _screen_x_offset = 0;
-    _screen_y_offset = 0;
+    _screen_x_offset = 0.0;
+    _screen_y_offset = 0.0;
 }
 
 BomberGraphicsRenderer::~BomberGraphicsRenderer()
@@ -163,23 +163,17 @@ void BomberGraphicsRenderer::display()
 
 void BomberGraphicsRenderer::draw(BomberTexture *texture, BomberCoordinates &coords)
 {
+    double screen_x1 = coords.get_x() - _screen_x_offset;
+    double screen_y1 = coords.get_y() - _screen_y_offset;
+    double screen_x2 = screen_x1 + texture->get_width();
+    double screen_y2 = screen_y1 + texture->get_height();
 
-    // double zoom_x = (double)_screen_width / (double)_bbox.get_dimensions().get_width();
-    // double zoom_y = (double)_screen_height / (double)_bbox.get_dimensions().get_height();
-
-    int screen_x1 = coords.get_x() - _screen_x_offset;
-    int screen_y1 = coords.get_y() - _screen_y_offset;
-    int screen_x2 = screen_x1 + texture->get_width();
-    int screen_y2 = screen_y1 + texture->get_height();
-
-    SDL_Rect box;
-    box.x = (int)((double)screen_x1 * _x_scale_factor);
-    box.y = (int)((double)screen_y1 * _y_scale_factor);
-    box.w = (int)round((texture->get_width() * _x_scale_factor));
-    box.h = (int)round((texture->get_height() * _y_scale_factor));
-    //cout << "==> " << screen_x1 << "," << screen_y1 << "[" << _bbox.get_x() << "," << _bbox.get_y() << endl;
-    // BomberLogger::get_instance()->info("IO:GRAPHICS:draw texture({},{},{},{})", box.x, box.y, box.w, box.h);
-    SDL_RenderCopy(_renderer, texture->get_texture(), NULL, &box);
+    SDL_FRect box;
+    box.x = screen_x1 * _x_scale_factor;
+    box.y = screen_y1 * _y_scale_factor;
+    box.w = texture->get_width() * _x_scale_factor;
+    box.h = texture->get_height() * _y_scale_factor;
+    SDL_RenderCopyF(_renderer, texture->get_texture(), NULL, &box);   
 }
 
 unique_ptr<BomberTexture> BomberGraphicsRenderer::load_texture(BomberImg *img)

@@ -11,6 +11,7 @@ shared_ptr<Sprite> SpriteGameAsset::load()
     auto spritesheet = BomberSpriteSheet::load_from_png(_spritesheet_filename);
     auto parsed_tags = ase_sp_metadata->get_tags();
     auto parsed_frames = ase_sp_metadata->get_frames();
+    auto parsed_slices = ase_sp_metadata->get_slices();
     // load states and frames...
     vector<shared_ptr<SpriteState>> states;
     states.reserve(parsed_tags.size());
@@ -32,8 +33,16 @@ shared_ptr<Sprite> SpriteGameAsset::load()
         }
         states.push_back(make_shared<SpriteState>(tag->first, tag->second.is_repeated(), frames));
     }
+    // load bounding box
+    vector<shared_ptr<SpriteBoundingBox>> boundingBoxes;
+    boundingBoxes.reserve(parsed_tags.size());
+    for (auto slice = parsed_slices.begin(); slice != parsed_slices.end(); ++slice)
+    {
+        boundingBoxes.push_back(make_shared<SpriteBoundingBox>(slice->get_name(), slice->get_x(), slice->get_y(), slice->get_width(), slice->get_height()));
+    }
+
     BomberLogger::get_instance()->info("GAME:ENGINE:ASSETS:ASSET:SPRITES:sprite:{}:load - END", _name.c_str());
-    return make_shared<Sprite>(_name, states);
+    return make_shared<Sprite>(_name, states, boundingBoxes);
 }
 
 shared_ptr<Level> LevelGameAsset::load()
@@ -44,9 +53,9 @@ shared_ptr<Level> LevelGameAsset::load()
     ase_sp_metadata->dump();
     auto parsed_frames = ase_sp_metadata->get_frames();
     auto parsed_tags = ase_sp_metadata->get_tags();
-    map<int,TTile_material> materials;
+    map<int, TTile_material> materials;
     // parse map
-    shared_ptr<LevelGameMap> level_map = LevelGameMap::parse(ase_sp_metadata, _level_map_filename);
+    auto level_map = LevelGameMap::parse(ase_sp_metadata, _level_map_filename);
     for (auto tag = parsed_tags.begin(); tag != parsed_tags.end(); ++tag)
     {
         int from_frame_index = tag->second.get_from();
@@ -61,7 +70,8 @@ shared_ptr<Level> LevelGameAsset::load()
         {
             material = DECO;
         }
-        for(int i = from_frame_index; i <= to_frame_index; i++) {
+        for (int i = from_frame_index; i <= to_frame_index; i++)
+        {
             materials.insert({i, material});
         }
     }
@@ -69,27 +79,31 @@ shared_ptr<Level> LevelGameAsset::load()
     // parse spritesheet PNG
     vector<shared_ptr<BomberImg>> sp_tiles;
     auto spritesheet = BomberSpriteSheet::load_from_png(_spritesheet_filename);
-    for(auto& frame : parsed_frames) {
+    for (auto &frame : parsed_frames)
+    {
         sp_tiles.push_back(spritesheet->load(frame.get_x(), frame.get_y(), frame.get_width(), frame.get_height()));
     }
     vector<shared_ptr<BomberImg>> tiles;
     map<int, TTile_material> tiles_materials;
-    for(int i = 0; i < level_map->get_size(); i++) {
+    for (int i = 0; i < level_map->get_size(); i++)
+    {
         int frame_index = level_map->get_cell(i);
         BomberLogger::get_instance()->info("GAME:ENGINE:ASSETS:ASSET:level:{}:load {}:{}", _name.c_str(), i, frame_index);
-        if (frame_index < sp_tiles.size()) {
+        if (frame_index < sp_tiles.size())
+        {
             auto tile_img = sp_tiles[frame_index];
             tiles.push_back(tile_img);
             tiles_materials.insert({i, GROUND});
         }
-        else {
+        else
+        {
             stringstream ss;
-            ss << "Invalid tile(" << i << "):" << frame_index << "(map size=" <<  sp_tiles.size() << ")";
+            ss << "Invalid tile(" << i << "):" << frame_index << "(map size=" << sp_tiles.size() << ")";
             throw InvalidAssetException(ss.str());
         }
     }
     BomberLogger::get_instance()->info("GAME:ENGINE:ASSETS:ASSET:level:{}:load - END", _name.c_str());
-    return make_shared<Level>(level_map->get_name(), 32,32,level_map->get_columns(), level_map->get_rows(), level_map->get_default_camera(), tiles_materials, tiles);
+    return make_shared<Level>(level_map->get_name(), 32, 32, level_map->get_columns(), level_map->get_rows(), level_map->get_default_camera(), tiles_materials, tiles);
 }
 
 tuple<shared_ptr<SpritesRepository>, shared_ptr<LevelsRepository>> GameAssets::load()

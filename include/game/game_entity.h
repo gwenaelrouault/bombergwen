@@ -4,11 +4,20 @@
 
 using namespace std;
 
+typedef enum {
+    ENTITY_UP, ENTITY_DOWN, ENTITY_LEFT, ENTITY_RIGHT
+} TEntityEvent;
+
+typedef struct {
+    int x_offset;
+    int y_offset;
+} TEntityVelocity;
+
 class Entity
 {
 public:
     Entity(const string &name, shared_ptr<SpritesRepository> sprites)
-        : _sprite(sprites->get(name)), _x(0), _y(0), _speed(0) {}
+        : _sprite(sprites->get(name)), _x(0), _y(0), _speed(0), _velocity({0,0}) {}
     Entity(const string &name, shared_ptr<SpritesRepository> sprites, int speed)
         : _sprite(sprites->get(name)), _x(0), _y(0), _speed(speed) {}
     virtual ~Entity() {}
@@ -17,11 +26,15 @@ public:
 
     virtual void init(BomberGraphicsRenderer *renderer);
 
-    void update(int elapsed_ms);
+    bool update(int elapsed_ms);
     void draw(BomberGraphicsRenderer *renderer);
     void move(int x_offset, int y_offset);
 
     void set_position(const BomberCoordinates &coords);
+    void set_velocity(int xoffset, int yoffset);
+
+    const TEntityVelocity& get_velocity() { return _velocity; }
+
     const BomberCoordinates & get_position() { return _sprite->get_coords(); }
 
 protected:
@@ -29,36 +42,7 @@ protected:
     int _x;
     int _y;
     int _speed;
+    TEntityVelocity _velocity;
 };
 
-class Hero : public Entity
-{
-public:
-    Hero(shared_ptr<SpritesRepository> sprites) : Entity(NAME_HERO, sprites, 2) {}
-    virtual ~Hero() {}
 
-    int on_UP();
-    int on_DOWN();
-    int on_RIGHT();
-    int on_LEFT();
-
-private:
-};
-
-class Dino : public Entity
-{
-public:
-    Dino(shared_ptr<SpritesRepository> sprites) : Entity(NAME_DINO, sprites) {}
-    virtual ~Dino() {}
-
-private:
-};
-
-class Dilo : public Entity
-{
-public:
-    Dilo(shared_ptr<SpritesRepository> sprites) : Entity(NAME_DILO, sprites) {}
-    virtual ~Dilo() {}
-
-private:
-};

@@ -15,15 +15,15 @@ using namespace std;
 class BomberBBox
 {
 public:
-    BomberBBox(int x, int y, int width, int height, int screen_width, int screen_height)
+    BomberBBox(double x, double y, double width, double height, double screen_width, double screen_height)
         : _coords(x, y), _dimensions(width, height), _screen_dimensions(screen_width, screen_height) {}
     BomberBBox() : _coords(0, 0), _dimensions(0, 0), _screen_dimensions(0, 0) {
 
     }
     ~BomberBBox() {}
 
-    int get_x() const { return _coords.get_x(); }
-    int get_y() const { return _coords.get_y(); }
+    double get_x() const { return _coords.get_x(); }
+    double get_y() const { return _coords.get_y(); }
 
     const BomberDimensions& get_dimensions() { return _dimensions; }
     const BomberDimensions& get_screen_dimensions() { return _screen_dimensions; }
@@ -32,7 +32,7 @@ public:
 
     void set_position(const BomberCoordinates &coords);
 
-    void set_dimension(int width, int height);
+    void set_dimension(double width, double height);
 
     const BomberCoordinates &get_coords()
     {
@@ -124,8 +124,8 @@ private:
     int _screen_height;
     double _x_scale_factor;
     double _y_scale_factor;
-    int _screen_x_offset;
-    int _screen_y_offset;
+    double _screen_x_offset;
+    double _screen_y_offset;
     BomberBBox _bbox;
 };
 

@@ -58,6 +58,11 @@ void AseSpritesheet::add_tag(const string &name, int from_index, int to_index, b
     _tags.insert({name, AseTag(name, from_index, to_index, repeated_frame)});
 }
 
+void AseSpritesheet::add_slice(const string &name, int x, int y, int width, int height)
+{
+    _slices.push_back(AseSlice(name, x, y, width, height));
+}
+
 void AseSpritesheet::dump()
 {
     cout << *this << endl;
@@ -87,7 +92,6 @@ shared_ptr<AseSpritesheet> AseSpritesheet::parse(const string &filename)
         int sp_height = json_meta.at("size").at("h");
         auto result = make_shared<AseSpritesheet>(sp_width, sp_height);
         BomberLogger::get_instance()->info("GAME:ENGINE:ASSETS:ASSET:AseSpritesheet:parse({}):width={},height={}", filename, sp_width, sp_height);
-        
         cout << "PARSE frames"<< filename << endl;
         nlohmann::json json_frames = parsed_json.at("frames");
         for (auto it = json_frames.items().begin(); it != json_frames.items().end(); ++it)
@@ -114,6 +118,23 @@ shared_ptr<AseSpritesheet> AseSpritesheet::parse(const string &filename)
             bool is_repeated = !tag.contains("repeat");
             result->add_tag(name, from_index, to_index, is_repeated);
         }
+
+        nlohmann::json json_slices = json_meta.at("slices");
+        for (auto &slices : json_slices)
+        {
+            string name = slices.at("name");
+            nlohmann::json slice_keys = slices.at("keys");
+            for (auto &slice_key : slice_keys) {
+                nlohmann::json slice_bounds = slice_key.at("bounds");
+                int x = slice_bounds.at("x");
+                int y = slice_bounds.at("y");
+                int w = slice_bounds.at("w");
+                int h = slice_bounds.at("h");
+                cout << "Slice(" << x << "," << y << "," << w << "," << h << ")" << endl;
+                result->add_slice(name, x, y, w, h);
+            }
+        }
+
         BomberLogger::get_instance()->info("GAME:ENGINE:ASSETS:ASSET:AseSpritesheet:parse({}) - END", filename);
         return result;
     }

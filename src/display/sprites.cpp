@@ -50,14 +50,12 @@ void Sprite::init(BomberGraphicsRenderer *renderer)
         auto state = state_it->second;
         state->init(renderer);
     }
-    // _box.x = 0;
-    // _box.y = 0;
 }
 
 void Sprite::move(int offset_x, int offset_y)
 {
-    _coords.set_x(_coords.get_x() + offset_x);
-    _coords.set_y(_coords.get_y() + offset_y);
+    _coords.set_x(_coords.get_x() + (double) offset_x);
+    _coords.set_y(_coords.get_y() + (double) offset_y);
 }
 
 void Sprite::set_position(const BomberCoordinates &coords)
@@ -65,41 +63,35 @@ void Sprite::set_position(const BomberCoordinates &coords)
     _coords = coords;
 }
 
-void Sprite::update(int elapsed_ms)
+bool Sprite::update(int elapsed_ms)
 {
+    bool frame_update = false;
     _current_elapsed_time += elapsed_ms;
-    // cout << "CURRENT TIME : " << _current_elapsed_time << endl;
     auto current_frame = get_current_frame();
     if (current_frame != nullptr && _current_elapsed_time >= current_frame->get_duration())
     {
         int next_index = _current_index + 1;
         if (next_index < (int)_current_state->get_frames_nb())
         {
-            // cout << "NEXT INDEX : " << next_index << endl;
             _current_index = next_index;
+            frame_update = true;
         }
         else if (_current_state->is_repeated())
         {
-            // cout << "FIN ANIM IS REPET" << endl;
             _current_index = 0;
-        }
-        else
-        {
-            // cout << "FIN ANIM" << endl;
+            frame_update = true;
         }
         _current_elapsed_time = 0;
     }
+    return frame_update;
 }
 
 void Sprite::draw(BomberGraphicsRenderer *renderer)
 {
-    //cout << "draw sprite(" << _name << ")" << endl;
     if (get_current_frame() != nullptr)
     {
         renderer->draw(get_current_frame()->get_texture().get(), _coords);
     }
-    // if (get_current_frame() != nullptr) cout <<"ERRREUR NULL" << endl;
-    // SDL_RenderCopy(renderer, , NULL, &_box);
 }
 
 void Sprite::set_current_state(const string &name)

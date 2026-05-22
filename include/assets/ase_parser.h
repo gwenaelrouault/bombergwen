@@ -1,4 +1,5 @@
 #pragma once
+
 #include <iostream>
 #include "bomber_exceptions.h"
 #include <memory>
@@ -13,6 +14,27 @@ class AseParseException : public BomberException
 {
 public:
     AseParseException(const std::string &msg) : BomberException(msg) {}
+};
+
+class AseSlice
+{
+public:
+    AseSlice(const string &name, int x, int y, int w, int h)
+        : _name(name), _x(x), _y(y), _width(w), _height(h) {}
+    ~AseSlice() {}
+
+    int get_x() const { return _x; }
+    int get_y() const { return _y; }
+    int get_width() const { return _width; }
+    int get_height() const { return _height; }
+    const string &get_name() const { return _name; }
+
+private:
+    string _name;
+    int _x;
+    int _y;
+    int _width;
+    int _height;
 };
 
 class AseFrame
@@ -66,11 +88,14 @@ class AseSpritesheet
 public:
     AseSpritesheet(int width, int height) : _width(width), _height(height) {}
     ~AseSpritesheet() {}
+
     const map<string, AseTag> &get_tags() { return _tags; }
     const vector<AseFrame> &get_frames() { return _frames; }
+    const vector<AseSlice> &get_slices() { return _slices; }
 
     void add_tag(const string &name, int from_index, int to_index, bool repeated_frame);
     void add_frame(const string &name, int x, int y, int width, int height, int duration);
+    void add_slice(const string &name, int x, int y, int width, int height);
 
     friend ostream &operator<<(std::ostream &os, const AseSpritesheet &p);
 
@@ -83,6 +108,7 @@ private:
     int _height;
     map<string, AseTag> _tags;
     vector<AseFrame> _frames;
+    vector<AseSlice> _slices;
 
     int extract_number_from_name(const string &name);
 };

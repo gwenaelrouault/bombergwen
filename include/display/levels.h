@@ -32,7 +32,6 @@ private:
     int _columns;
     int _rows;
     int _size;
-    
 };
 
 class LevelTile
@@ -79,7 +78,7 @@ public:
 
     virtual void init(BomberGraphicsRenderer *renderer);
 
-    virtual void update(int elapsed_ms);
+    virtual bool update(int elapsed_ms);
 
     virtual void draw(BomberGraphicsRenderer *renderer);
 

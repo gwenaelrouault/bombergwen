@@ -22,7 +22,7 @@ public:
 
     virtual void init(BomberGraphicsRenderer *renderer) = 0;
 
-    virtual void update(int elapsed_ms) = 0;
+    virtual bool update(int elapsed_ms) = 0;
 
     virtual void draw(BomberGraphicsRenderer* renderer) = 0;
 

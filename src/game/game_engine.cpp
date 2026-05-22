@@ -66,25 +66,11 @@ bool GameEngine::update(int elapsed_ms)
         if (event == BOMBER_QUIT || event == BOMBER_KEY_ESCAPE) {
             return false;
         }
-        else if (event == BOMBER_KEY_UP)
-        {
-            _world->on_UP(_renderer.get());
+        else {
+            _world->on_event(event);
         }
-        else if (event == BOMBER_KEY_DOWN)
-        {
-            _world->on_DOWN(_renderer.get());
-        }
-        else if (event == BOMBER_KEY_LEFT)
-        {
-            _world->on_LEFT(_renderer.get());
-        }
-        else if (event == BOMBER_KEY_RIGHT)
-        {
-            _world->on_RIGHT(_renderer.get());
-        }
-        
     }
-    _world->update(elapsed_ms);
+    _world->update(_renderer.get(), elapsed_ms);
     return true;
 }
 

@@ -8,7 +8,7 @@ void World::load(shared_ptr<SpritesRepository> sprites, shared_ptr<LevelsReposit
     BomberLogger::get_instance()->info("GAME:ENGINE:WORLD:load - START");
     _sprites = sprites;
     _levels = levels;
-    _hero = make_shared<Hero>(sprites);
+    _hero = make_shared<MainHero>(sprites, NAME_HERO);
     _entities.push_back(_hero);
     BomberLogger::get_instance()->info("GAME:ENGINE:WORLD:load - END");
 }
@@ -44,15 +44,26 @@ void World::init(BomberGraphicsRenderer *renderer)
     BomberLogger::get_instance()->info("GAME:ENGINE:WORLD:init - END");
 }
 
-void World::update(int elapsed_ms)
+void World::update(BomberGraphicsRenderer *renderer, int elapsed_ms)
 {
     if (_selected_level != nullptr)
     {
         _selected_level->update(elapsed_ms);
     }
-    for (auto &entity : _entities)
+    for (auto &entity : _ennemies)
     {
         entity->update(elapsed_ms);
+    }
+    if (_hero->update(elapsed_ms))
+    {
+        auto velocity = _hero->get_velocity();
+        auto camera = renderer->get_bbox();
+        BomberCoordinates camera_new_coords(camera.get_coords().get_x() + velocity.x_offset, camera.get_coords().get_y() + velocity.y_offset);
+        camera.set_position(camera_new_coords);
+        if (_selected_level->is_inside(camera.get_rect()))
+        {
+            renderer->select_camera(&camera);
+        }
     }
 }
 
@@ -68,64 +79,23 @@ void World::draw(BomberGraphicsRenderer *renderer)
     }
 }
 
-void World::on_UP(BomberGraphicsRenderer *renderer)
+void World::on_event(T_BomberKeyEvent event)
 {
-    int step_up = _hero->on_UP();
-    if (step_up != 0)
+    switch (event)
     {
-        auto camera = renderer->get_bbox();
-        BomberCoordinates camera_new_coords(camera.get_coords().get_x(), camera.get_coords().get_y() + step_up);
-        camera.set_position(camera_new_coords);
-        if (_selected_level->is_inside(camera.get_rect()))
-        {
-            renderer->select_camera(&camera);
-        }
-    }
-}
-
-void World::on_DOWN(BomberGraphicsRenderer *renderer)
-{
-    int step_down = _hero->on_DOWN();
-    if (step_down != 0 && _selected_level != nullptr)
-    {
-        auto camera = renderer->get_bbox();
-        BomberCoordinates camera_new_coords(camera.get_coords().get_x(), camera.get_coords().get_y() + step_down);
-        camera.set_position(camera_new_coords);
-        if (_selected_level->is_inside(camera.get_rect()))
-        {
-            renderer->select_camera(&camera);
-        }
-    }
-}
-
-void World::on_RIGHT(BomberGraphicsRenderer *renderer)
-{
-    int step_right = _hero->on_RIGHT();
-    if (step_right != 0 && _selected_level != nullptr)
-    {
-        auto camera = renderer->get_bbox();
-        BomberCoordinates camera_new_coords(camera.get_coords().get_x() + step_right, camera.get_coords().get_y());
-        camera.set_position(camera_new_coords);
-        if (_selected_level->is_inside(camera.get_rect()))
-        {
-            renderer->select_camera(&camera);
-        }
-    }
-}
-
-void World::on_LEFT(BomberGraphicsRenderer *renderer)
-{
-    int step_left = _hero->on_LEFT();
-    if (step_left != 0 && _selected_level != nullptr)
-    {
-        auto camera = renderer->get_bbox();
-        BomberCoordinates camera_new_coords(camera.get_coords().get_x() + step_left, camera.get_coords().get_y());
-        camera.set_position(camera_new_coords);
-        BomberLogger::get_instance()->info("CAMERA({},{},{},{})", camera.get_rect().x1, camera.get_rect().y1, camera.get_rect().x2, camera.get_rect().y2);
-
-        if (_selected_level->is_inside(camera.get_rect()))
-        {
-            renderer->select_camera(&camera);
-        }
+    case T_BomberKeyEvent::BOMBER_KEY_DOWN:
+        _hero->on_event(TEntityEvent::ENTITY_DOWN);
+        break;
+    case T_BomberKeyEvent::BOMBER_KEY_LEFT:
+        _hero->on_event(TEntityEvent::ENTITY_LEFT);
+        break;
+    case T_BomberKeyEvent::BOMBER_KEY_RIGHT:
+        _hero->on_event(TEntityEvent::ENTITY_RIGHT);
+        break;
+    case T_BomberKeyEvent::BOMBER_KEY_UP:
+        _hero->on_event(TEntityEvent::ENTITY_UP);
+        break;
+    default:
+        BomberLogger::get_instance()->debug("GAME:ENGINE:WORLD:onevent ignored");
     }
 }
