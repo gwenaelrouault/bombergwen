@@ -132,11 +132,6 @@ public:
 
     void on_event(TEntityEvent evt);
 
-    int on_UP();
-    int on_DOWN();
-    int on_RIGHT();
-    int on_LEFT();
-
 private:
     THeroState _current_state;
     map<THeroState, unique_ptr<HeroState>> _states;
