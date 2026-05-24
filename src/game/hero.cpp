@@ -79,6 +79,8 @@ THeroState HeroStateWalkDown::get_next_state(TEntityEvent evt)
         return THeroState::STATE_IDLE_LEFT;
     case TEntityEvent::ENTITY_RIGHT:
         return THeroState::STATE_IDLE_RIGHT;
+    case TEntityEvent::ENTITY_DOWN_CANCEL:
+        return THeroState::STATE_IDLE_DOWN;
     default:
         return get_id();
     }
@@ -94,6 +96,8 @@ THeroState HeroStateWalkUp::get_next_state(TEntityEvent evt)
         return THeroState::STATE_IDLE_LEFT;
     case TEntityEvent::ENTITY_RIGHT:
         return THeroState::STATE_IDLE_RIGHT;
+    case TEntityEvent::ENTITY_UP_CANCEL:
+        return THeroState::STATE_IDLE_UP;
     default:
         return get_id();
     }
@@ -109,6 +113,8 @@ THeroState HeroStateWalkLeft::get_next_state(TEntityEvent evt)
         return THeroState::STATE_IDLE_UP;
     case TEntityEvent::ENTITY_RIGHT:
         return THeroState::STATE_IDLE_RIGHT;
+    case TEntityEvent::ENTITY_LEFT_CANCEL:
+        return THeroState::STATE_IDLE_LEFT;
     default:
         return get_id();
     }
@@ -124,6 +130,8 @@ THeroState HeroStateWalkRight::get_next_state(TEntityEvent evt)
         return THeroState::STATE_IDLE_UP;
     case TEntityEvent::ENTITY_LEFT:
         return THeroState::STATE_IDLE_LEFT;
+    case TEntityEvent::ENTITY_RIGHT_CANCEL:
+        return THeroState::STATE_IDLE_RIGHT;
     default:
         return get_id();
     }

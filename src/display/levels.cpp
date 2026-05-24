@@ -14,7 +14,6 @@ void LevelTile::load_texture(BomberGraphicsRenderer *renderer)
 
 void LevelTile::draw(BomberGraphicsRenderer *renderer)
 {
-    //cout << "DRAW TILE(" << _column << "," << _row << ")" << endl;
     renderer->draw(_texture.get(), _coords);
 }
 
@@ -22,18 +21,18 @@ Level::Level(const string &name,
              int cell_width, int cell_height,
              int columns, int rows,
              shared_ptr<BomberBBox> default_camera,
-             const map<int, TTile_material> &tiles_material,
-             const vector<shared_ptr<BomberImg>> &tiles) : _dimensions(make_unique<LevelDimensions>(cell_width, cell_height, columns, rows)),
+             const vector<shared_ptr<LevelCell>> &tiles) : _dimensions(make_unique<LevelDimensions>(cell_width, cell_height, columns, rows)),
                                                            _default_camera(default_camera),
                                                            DisplayableItem(name)
 {
+    _columns = columns;
+    _rows = rows;
     int row = 0;
     int col = 0;
     int index = 0;
-    for (auto tile_img : tiles)
-    {  
-        auto material = tiles_material.at(index++);
-        auto tile = make_unique<LevelTile>(tile_img, row, col, material);
+    for (auto cell : tiles)
+    {
+        auto tile = make_unique<LevelTile>(cell->get_img(), row, col, cell->get_material());
         _tiles.push_back(std::move(tile));
         if (++col >= columns)
         {
@@ -70,14 +69,12 @@ void Level::init(BomberGraphicsRenderer *renderer)
 
 bool Level::update(int elapsed_ms)
 {
-    (void) elapsed_ms;
-    //cout << "update level" << _name << endl;
+    (void)elapsed_ms;
     return false;
 }
 
 void Level::draw(BomberGraphicsRenderer *renderer)
 {
-    //cout << "draw level(" << _name << ")" << endl;
     for (int i = 0; i < _tiles.size(); i++)
     {
         _tiles.at(i)->draw(renderer);
@@ -94,9 +91,24 @@ void LevelsRepository::dump()
     }
 }
 
-BomberCoordinates Level::get_tile_coords(const BomberCoordinates &coords)
+BomberCoordinates Level::get_tile_coords(const GridCoordinates &coords)
 {
-    int x = _dimensions->get_cell_width() * coords.get_x();
-    int y = _dimensions->get_cell_height() * coords.get_y();
+    double x = _dimensions->get_cell_width() * coords.get_column();
+    double y = _dimensions->get_cell_height() * coords.get_row();
     return BomberCoordinates(x, y);
+}
+
+GridCoordinates Level::get_grid_coords(const BomberCoordinates &coords)
+{
+    int x = (int)round(coords.get_x() / _dimensions->get_cell_width());
+    int y = (int)round(coords.get_y() / _dimensions->get_cell_height());
+    cout << "X " << x << "coordx " << coords.get_x() << "coordy " << coords.get_y() << endl;
+    cout << "Y " << y << endl;
+    return GridCoordinates(y, x);
+}
+
+TTile_material Level::get_tile_material(const GridCoordinates &grid_coords)
+{
+    int index = grid_coords.get_row() * _columns + grid_coords.get_column();
+    return _tiles[index]->get_material();
 }

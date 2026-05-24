@@ -33,6 +33,24 @@ vector<T_BomberKeyEvent> BomberInputManager::process_events()
             {
                 events.push_back(BOMBER_KEY_UP);
             }
+        } else if (event.type == SDL_KEYUP)
+        {
+            if (event.key.keysym.sym == SDLK_DOWN)
+            {
+                events.push_back(BOMBER_KEY_DOWN_CANCEL);
+            }
+            else if (event.key.keysym.sym == SDLK_RIGHT)
+            {
+                events.push_back(BOMBER_KEY_RIGHT_CANCEL);
+            }
+            else if (event.key.keysym.sym == SDLK_LEFT)
+            {
+                events.push_back(BOMBER_KEY_LEFT_CANCEL);
+            }
+            else if (event.key.keysym.sym == SDLK_UP)
+            {
+                events.push_back(BOMBER_KEY_UP_CANCEL);
+            }
         }
     }
     return events;

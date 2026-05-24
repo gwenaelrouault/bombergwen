@@ -12,6 +12,10 @@ typedef enum {
     BOMBER_KEY_DOWN,
     BOMBER_KEY_LEFT,
     BOMBER_KEY_RIGHT,
+    BOMBER_KEY_UP_CANCEL,
+    BOMBER_KEY_DOWN_CANCEL,
+    BOMBER_KEY_LEFT_CANCEL,
+    BOMBER_KEY_RIGHT_CANCEL,
 } T_BomberKeyEvent;
 
 class BomberInputManager

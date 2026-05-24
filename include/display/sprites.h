@@ -113,6 +113,8 @@ public:
         return _current_state != nullptr ? _current_state->get_frame(_current_index) : nullptr;
     }
 
+    shared_ptr<SpriteBoundingBox> get_bounding_box() { return _bounding_boxes[BOUNDING_BOX]; }
+
     const BomberCoordinates &get_coords() const { return _coords; }
 
     void move(int offset_x, int offset_y);

@@ -51,6 +51,10 @@ shared_ptr<LevelGameMap> LevelGameMap::parse(shared_ptr<AseSpritesheet> spritesh
         }
         cells.push_back(cell);
     }
+    for(int i = 0; i < cells.size(); i++) {
+        cout << cells[i];
+    }
+    cout << endl;
     nlohmann::json json_camera = parsed_json.at("camera");
     int x_camera = json_camera.at("x");
     int y_camera = json_camera.at("y");

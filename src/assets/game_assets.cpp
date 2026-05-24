@@ -83,8 +83,7 @@ shared_ptr<Level> LevelGameAsset::load()
     {
         sp_tiles.push_back(spritesheet->load(frame.get_x(), frame.get_y(), frame.get_width(), frame.get_height()));
     }
-    vector<shared_ptr<BomberImg>> tiles;
-    map<int, TTile_material> tiles_materials;
+    vector<shared_ptr<LevelCell>> tiles;
     for (int i = 0; i < level_map->get_size(); i++)
     {
         int frame_index = level_map->get_cell(i);
@@ -92,8 +91,8 @@ shared_ptr<Level> LevelGameAsset::load()
         if (frame_index < sp_tiles.size())
         {
             auto tile_img = sp_tiles[frame_index];
-            tiles.push_back(tile_img);
-            tiles_materials.insert({i, GROUND});
+            auto material = materials.at(frame_index);
+            tiles.push_back(make_shared<LevelCell>(tile_img, material));
         }
         else
         {
@@ -102,8 +101,9 @@ shared_ptr<Level> LevelGameAsset::load()
             throw InvalidAssetException(ss.str());
         }
     }
+    cout << endl;
     BomberLogger::get_instance()->info("GAME:ENGINE:ASSETS:ASSET:level:{}:load - END", _name.c_str());
-    return make_shared<Level>(level_map->get_name(), 32, 32, level_map->get_columns(), level_map->get_rows(), level_map->get_default_camera(), tiles_materials, tiles);
+    return make_shared<Level>(level_map->get_name(), 32, 32, level_map->get_columns(), level_map->get_rows(), level_map->get_default_camera(), tiles);
 }
 
 tuple<shared_ptr<SpritesRepository>, shared_ptr<LevelsRepository>> GameAssets::load()

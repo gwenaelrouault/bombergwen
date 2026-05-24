@@ -23,7 +23,7 @@ void World::select_level(const string &name, BomberGraphicsRenderer *renderer)
         throw NoLevelException(ss.str());
     }
     _selected_level = _levels->get(name);
-    BomberCoordinates hero_start_position_grid(2, 2);
+    GridCoordinates hero_start_position_grid(2, 2);
     BomberCoordinates hero_start_position = _selected_level->get_tile_coords(hero_start_position_grid);
     BomberLogger::get_instance()->info("GAME:ENGINE:WORLD:POS HERO {},{}", hero_start_position.get_x(), hero_start_position.get_y());
     _hero->set_position(hero_start_position);
@@ -52,9 +52,9 @@ void World::update(BomberGraphicsRenderer *renderer, int elapsed_ms)
     }
     for (auto &entity : _ennemies)
     {
-        entity->update(elapsed_ms);
+        entity->update(_selected_level.get(), elapsed_ms);
     }
-    if (_hero->update(elapsed_ms))
+    if (_hero->update(_selected_level.get(),elapsed_ms))
     {
         auto velocity = _hero->get_velocity();
         auto camera = renderer->get_bbox();
@@ -94,6 +94,18 @@ void World::on_event(T_BomberKeyEvent event)
         break;
     case T_BomberKeyEvent::BOMBER_KEY_UP:
         _hero->on_event(TEntityEvent::ENTITY_UP);
+        break;
+    case T_BomberKeyEvent::BOMBER_KEY_DOWN_CANCEL:
+        _hero->on_event(TEntityEvent::ENTITY_DOWN_CANCEL);
+        break;
+    case T_BomberKeyEvent::BOMBER_KEY_LEFT_CANCEL:
+        _hero->on_event(TEntityEvent::ENTITY_LEFT_CANCEL);
+        break;
+    case T_BomberKeyEvent::BOMBER_KEY_RIGHT_CANCEL:
+        _hero->on_event(TEntityEvent::ENTITY_RIGHT_CANCEL);
+        break;
+    case T_BomberKeyEvent::BOMBER_KEY_UP_CANCEL:
+        _hero->on_event(TEntityEvent::ENTITY_UP_CANCEL);
         break;
     default:
         BomberLogger::get_instance()->debug("GAME:ENGINE:WORLD:onevent ignored");

@@ -9,3 +9,5 @@
 #define STATE_WALK_DOWN_NAME "walk_down"
 #define STATE_WALK_LEFT_NAME "walk_left"
 #define STATE_WALK_RIGHT_NAME "walk_right"
+
+#define BOUNDING_BOX "boundingbox"

@@ -11,6 +11,21 @@ typedef enum {
     PLOT
 } TTile_material;
 
+class GridCoordinates
+{
+public:
+    GridCoordinates(int row, int col) : _row(row), _column(col) {}
+    ~GridCoordinates() {}
+
+    int get_row() const { return _row; }
+
+    int get_column() const { return _column; }
+
+private:
+    int _row;
+    int _column;
+};
+
 class LevelDimensions
 {
 public:
@@ -34,11 +49,25 @@ private:
     int _size;
 };
 
+class LevelCell
+{
+public:
+    LevelCell(shared_ptr<BomberImg> img, TTile_material material) : _img(img), _material(material) {}
+    ~LevelCell() {}
+
+    shared_ptr<BomberImg> get_img() { return _img; }
+    TTile_material get_material() { return _material; }
+    
+private:
+    shared_ptr<BomberImg> _img;
+    TTile_material _material;
+};
+
 class LevelTile
 {
 public:
     LevelTile(shared_ptr<BomberImg> img, int grid_row, int grid_column, TTile_material material)
-        : _img(img), _row(grid_row), _column(grid_column), _texture(nullptr), _coords(grid_column * img->get_width(), grid_row * img->get_height())
+        : _img(img), _row(grid_row), _column(grid_column), _texture(nullptr), _coords(grid_column * img->get_width(), grid_row * img->get_height()), _material(material)
     {
        // BomberLogger::get_instance()->info("PUT TILE(row={},colum,={}):{},{}", grid_row,grid_column,_x, _y);
     }
@@ -72,8 +101,7 @@ public:
           int cell_width, int cell_height,
           int columns, int rows,
           shared_ptr<BomberBBox> default_camera,
-          const map<int, TTile_material> &tiles_material,
-          const vector<shared_ptr<BomberImg>> &tiles);
+          const vector<shared_ptr<LevelCell>> &tiles);
     virtual ~Level();
 
     virtual void init(BomberGraphicsRenderer *renderer);
@@ -86,13 +114,17 @@ public:
 
     shared_ptr<BomberBBox> get_default_camera() { return _default_camera; }
 
-    BomberCoordinates get_tile_coords(const BomberCoordinates& grid_coords);
+    BomberCoordinates get_tile_coords(const GridCoordinates& grid_coords);
+
+    GridCoordinates get_grid_coords(const BomberCoordinates& coords);
     
     const LevelDimensions& get_dimension() { return *_dimensions.get(); }
 
     bool is_inside(const BomberRect& rect);
 
     int compute_size();
+
+    TTile_material get_tile_material(const GridCoordinates& grid_coords);
 
 private:
     int _columns;
