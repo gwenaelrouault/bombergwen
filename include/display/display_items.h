@@ -43,7 +43,7 @@ public:
         _items.insert({name, item});
     }
 
-    shared_ptr<T> get_copy(const string& name) { return _items.at(name); }
+    shared_ptr<T> get_copy(const string& name) { return _items.at(name)->clone(); }
 
     shared_ptr<T> get(const string& name) { return _items.at(name); }
 

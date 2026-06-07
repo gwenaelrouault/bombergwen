@@ -31,11 +31,11 @@ shared_ptr<SpriteBoundingBox> SpriteBoundingBox::clone()
 Sprite::Sprite(const string &name, vector<shared_ptr<SpriteState>> &states, vector<shared_ptr<SpriteBoundingBox>> &bb)
         : DisplayableItem(name), _current_index(0), _current_elapsed_time(0)
     {
-        for (auto &state : states)
+        for (auto state : states)
         {
             _states.insert({state->get_name(), state});
         }
-        for (auto &bbox : bb)
+        for (auto bbox : bb)
         {
             _bounding_boxes.insert({bbox->get_name(), bbox});
         }
@@ -46,11 +46,11 @@ Sprite::Sprite(const Sprite &sprite) : DisplayableItem(sprite)
     _current_index = sprite._current_index;
     _current_elapsed_time = sprite._current_elapsed_time;
     _coords = sprite._coords;
-    for (auto it =  sprite._states.begin(); it !=  sprite._states.end(); it++)
+    for (auto it =  sprite._states.begin(); it !=  sprite._states.end(); ++it)
     {
         _states.insert({it->first, it->second->clone()});
     }
-    for (auto it = sprite._bounding_boxes.begin(); it != sprite._bounding_boxes.end(); it++)
+    for (auto it = sprite._bounding_boxes.begin(); it != sprite._bounding_boxes.end(); ++it)
     {
         _bounding_boxes.insert({it->first, it->second->clone()});
     }
@@ -66,7 +66,7 @@ Sprite::Sprite(const Sprite &sprite) : DisplayableItem(sprite)
 
 void Sprite::init(BomberGraphicsRenderer *renderer)
 {
-    for (auto state_it = _states.begin(); state_it != _states.end(); state_it++)
+    for (auto state_it = _states.begin(); state_it != _states.end(); ++state_it)
     {
         auto state = state_it->second;
         state->init(renderer);

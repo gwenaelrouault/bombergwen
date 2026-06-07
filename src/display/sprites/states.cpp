@@ -11,19 +11,28 @@ ostream &operator<<(std::ostream &os, const SpriteState &s)
     return os;
 }
 
-SpriteState::SpriteState(const SpriteState& state)
+SpriteState::SpriteState(const string &name, bool is_repeated, vector<shared_ptr<SpriteFrame>> &frames)
+    : _name(name), _is_repeated(is_repeated)
+{
+    for (auto frame : frames)
+    {
+        _frames.push_back(frame);
+    }
+}
+
+SpriteState::SpriteState(const SpriteState &state)
 {
     _name = state._name;
     _is_repeated = state._is_repeated;
-    for(auto& frame : state._frames)
+    for (auto frame : state._frames)
     {
-        _frames.push_back(frame->clone());
+        _frames.push_back(frame);
     }
 }
 
 void SpriteState::init(BomberGraphicsRenderer *renderer)
 {
-    for (auto &frame : _frames)
+    for (auto frame : _frames)
     {
         frame->load_texture(renderer);
     }
