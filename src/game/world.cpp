@@ -3,11 +3,12 @@
 #include "bomber_logger.h"
 #include <sstream>
 
-void World::load(shared_ptr<SpritesRepository> sprites, shared_ptr<LevelsRepository> levels)
+void World::load(shared_ptr<SpritesRepository> sprites, shared_ptr<LevelsRepository> levels, shared_ptr<ObjectRepository> objects)
 {
     BomberLogger::get_instance()->info("GAME:ENGINE:WORLD:load - START");
     _sprites = sprites;
     _levels = levels;
+    _objects = objects;
     _hero = make_shared<MainHero>(sprites, NAME_HERO);
     _entities.push_back(_hero);
     BomberLogger::get_instance()->info("GAME:ENGINE:WORLD:load - END");
@@ -39,7 +40,7 @@ void World::init(BomberGraphicsRenderer *renderer)
     }
     for (auto &entity : _entities)
     {
-        entity->init(renderer);
+        entity->init(_selected_level, renderer);
     }
     BomberLogger::get_instance()->info("GAME:ENGINE:WORLD:init - END");
 }
@@ -107,6 +108,10 @@ void World::on_event(T_BomberKeyEvent event)
     case T_BomberKeyEvent::BOMBER_KEY_UP_CANCEL:
         _hero->on_event(TEntityEvent::ENTITY_UP_CANCEL);
         break;
+   case T_BomberKeyEvent::BOMBER_KEY_ACTION:
+        _hero->on_event(TEntityEvent::ENTITY_ACTION);
+        break; 
+    
     default:
         BomberLogger::get_instance()->debug("GAME:ENGINE:WORLD:onevent ignored");
     }

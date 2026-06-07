@@ -1,22 +1,6 @@
 #include "sprites.h"
 #include "bomber_logger.h"
 
-ostream &operator<<(std::ostream &os, const SpriteFrame &f)
-{
-    os << "Frame(width:" << f._width << ",height:" << f._height << ",sp:" << f._src_x << "," << f._src_y << ")";
-    return os;
-}
-
-ostream &operator<<(std::ostream &os, const SpriteState &s)
-{
-    os << "\tState(" << s._name << ",repeat=" << s._is_repeated << ")" << endl;
-    int i = 0;
-    for (auto &frame : s._frames)
-    {
-        os << "\t\t" << i++ << ":" << *frame.get() << endl;
-    }
-    return os;
-}
 
 ostream &operator<<(std::ostream &os, const Sprite &s)
 {
@@ -30,22 +14,59 @@ ostream &operator<<(std::ostream &os, const Sprite &s)
     return os;
 }
 
-void SpriteFrame::load_texture(BomberGraphicsRenderer *renderer)
+SpriteBoundingBox::SpriteBoundingBox(const SpriteBoundingBox& box)
 {
-    _texture = renderer->load_texture(_img.get());
+    _name = box._name;
+    _x = box._x;
+    _y = box._y;
+    _width = box._width;
+    _height = box._height;
 }
 
-void SpriteState::init(BomberGraphicsRenderer *renderer)
+shared_ptr<SpriteBoundingBox> SpriteBoundingBox::clone()
 {
-    for (auto &frame : _frames)
+    return make_shared<SpriteBoundingBox>(*this);
+}
+
+Sprite::Sprite(const string &name, vector<shared_ptr<SpriteState>> &states, vector<shared_ptr<SpriteBoundingBox>> &bb)
+        : DisplayableItem(name), _current_index(0), _current_elapsed_time(0)
     {
-        frame->load_texture(renderer);
+        for (auto &state : states)
+        {
+            _states.insert({state->get_name(), state});
+        }
+        for (auto &bbox : bb)
+        {
+            _bounding_boxes.insert({bbox->get_name(), bbox});
+        }
+    }
+
+Sprite::Sprite(const Sprite &sprite) : DisplayableItem(sprite)
+{
+    _current_index = sprite._current_index;
+    _current_elapsed_time = sprite._current_elapsed_time;
+    _coords = sprite._coords;
+    for (auto it =  sprite._states.begin(); it !=  sprite._states.end(); it++)
+    {
+        _states.insert({it->first, it->second->clone()});
+    }
+    for (auto it = sprite._bounding_boxes.begin(); it != sprite._bounding_boxes.end(); it++)
+    {
+        _bounding_boxes.insert({it->first, it->second->clone()});
+    }
+    if (sprite._current_state == nullptr)
+    {
+        _current_state = nullptr;
+    }
+    else
+    {
+        _current_state = _states[sprite._current_state->get_name()];
     }
 }
 
 void Sprite::init(BomberGraphicsRenderer *renderer)
 {
-    for (auto state_it = _states.begin(); state_it != _states.end(); ++state_it)
+    for (auto state_it = _states.begin(); state_it != _states.end(); state_it++)
     {
         auto state = state_it->second;
         state->init(renderer);
@@ -112,6 +133,11 @@ void Sprite::set_current_state(const string &name)
     {
         BomberLogger::get_instance()->error("SPRITE:cannot set state {}", name);
     }
+}
+
+shared_ptr<Sprite> Sprite::clone()
+{
+    return make_shared<Sprite>(*this);
 }
 
 void SpritesRepository::dump()

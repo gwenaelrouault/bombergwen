@@ -132,9 +132,11 @@ public:
 
     void on_event(TEntityEvent evt);
 
+    void put_bomb();
+
 private:
     THeroState _current_state;
-    map<THeroState, unique_ptr<HeroState>> _states;
+    map<THeroState, shared_ptr<HeroState>> _states;
 };
 
 class MainHero : public Hero

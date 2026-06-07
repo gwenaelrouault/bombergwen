@@ -11,3 +11,10 @@
 #define STATE_WALK_RIGHT_NAME "walk_right"
 
 #define BOUNDING_BOX "boundingbox"
+
+#define NAME_HERO "hero"
+#define NAME_LEVEL_1 "level1"
+#define NAME_LEVEL_1 "level1"
+
+#define BOMB1 "bomb1"
+#define BOMB2 "bomb2"

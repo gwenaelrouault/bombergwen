@@ -7,16 +7,15 @@
 
 using namespace std;
 
-#define NAME_HERO "hero"
-#define NAME_DINO "dino"
-#define NAME_DILO "dilo"
-
-#define NAME_LEVEL_1 "level1"
 
 class DisplayableItem
 {
 public:
     DisplayableItem(const string &name) : _name(name) {}
+
+    DisplayableItem(const DisplayableItem& item) {
+        _name = item.get_name();
+    }
 
     virtual ~DisplayableItem() {}
 
@@ -27,6 +26,7 @@ public:
     virtual void draw(BomberGraphicsRenderer* renderer) = 0;
 
     const string &get_name() const { return _name; }
+
 
 protected:
     string _name;
@@ -42,6 +42,8 @@ public:
     void add(const string& name, shared_ptr<T> item) {
         _items.insert({name, item});
     }
+
+    shared_ptr<T> get_copy(const string& name) { return _items.at(name); }
 
     shared_ptr<T> get(const string& name) { return _items.at(name); }
 

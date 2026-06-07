@@ -7,7 +7,8 @@ using namespace std;
 
 typedef enum {
     ENTITY_UP, ENTITY_DOWN, ENTITY_LEFT, ENTITY_RIGHT,
-    ENTITY_UP_CANCEL, ENTITY_DOWN_CANCEL, ENTITY_LEFT_CANCEL, ENTITY_RIGHT_CANCEL
+    ENTITY_UP_CANCEL, ENTITY_DOWN_CANCEL, ENTITY_LEFT_CANCEL, ENTITY_RIGHT_CANCEL,
+    ENTITY_ACTION
 } TEntityEvent;
 
 typedef struct {
@@ -15,18 +16,16 @@ typedef struct {
     int y_offset;
 } TEntityVelocity;
 
+constexpr int EPSILON_COLLIDERS = 4;
+
 class Entity
 {
 public:
     Entity(const string &name, shared_ptr<SpritesRepository> sprites)
-        : _sprite(sprites->get(name)), _speed(0), _velocity({0,0}) {}
-    Entity(const string &name, shared_ptr<SpritesRepository> sprites, int speed)
-        : _sprite(sprites->get(name)), _speed(speed) {}
+        : _sprite(sprites->get_copy(name)),  _velocity({0,0}), _level(nullptr) {}
     virtual ~Entity() {}
 
-    int get_speed() const { return _speed; }
-
-    virtual void init(BomberGraphicsRenderer *renderer);
+    virtual void init(shared_ptr<Level> level, BomberGraphicsRenderer *renderer);
 
     bool update(Level* level,int elapsed_ms);
     void draw(BomberGraphicsRenderer *renderer);
@@ -43,8 +42,8 @@ public:
 
 protected:
     shared_ptr<Sprite> _sprite;
-    int _speed;
     TEntityVelocity _velocity;
+    shared_ptr<Level> _level;
 
     bool can_move(Level* level, const BomberCoordinates& coords);
 };

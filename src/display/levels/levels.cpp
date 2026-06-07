@@ -7,16 +7,6 @@ ostream &operator<<(std::ostream &os, const Level &s)
     return os;
 }
 
-void LevelTile::load_texture(BomberGraphicsRenderer *renderer)
-{
-    _texture = renderer->load_texture(_img.get());
-}
-
-void LevelTile::draw(BomberGraphicsRenderer *renderer)
-{
-    renderer->draw(_texture.get(), _coords);
-}
-
 Level::Level(const string &name,
              int cell_width, int cell_height,
              int columns, int rows,
@@ -32,7 +22,7 @@ Level::Level(const string &name,
     int index = 0;
     for (auto cell : tiles)
     {
-        auto tile = make_unique<LevelTile>(cell->get_img(), row, col, cell->get_material());
+        auto tile = make_shared<LevelTile>(cell->get_img(), row, col, cell->get_material());
         _tiles.push_back(std::move(tile));
         if (++col >= columns)
         {
@@ -43,6 +33,20 @@ Level::Level(const string &name,
             }
         }
     }
+}
+
+
+Level::Level(const Level& level) : DisplayableItem(level)
+{
+    _columns = level._columns;
+    _rows = level._rows;
+    _size = level._size;
+    _dimensions = make_unique<LevelDimensions>(level._dimensions->get_cell_width(), level._dimensions->get_cell_height(), level._dimensions->get_columns(), level._dimensions->get_rows());
+    for(auto tile : level._tiles)
+    {
+        _tiles.push_back(tile);
+    }
+    _default_camera = level._default_camera;
 }
 
 Level::~Level()
@@ -109,6 +113,13 @@ GridCoordinates Level::get_grid_coords(const BomberCoordinates &coords)
 
 TTile_material Level::get_tile_material(const GridCoordinates &grid_coords)
 {
+    
     int index = grid_coords.get_row() * _columns + grid_coords.get_column();
+    cout << "MAT " << index << "," << grid_coords.get_row() << "," << grid_coords.get_column() << std::endl;
     return _tiles[index]->get_material();
+}
+
+shared_ptr<Level> Level::clone()
+{
+    return make_shared<Level>(*this);
 }

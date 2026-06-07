@@ -1,8 +1,9 @@
 #include "game_entity.h"
 #include "bomber_logger.h"
 
-void Entity::init(BomberGraphicsRenderer *renderer)
+void Entity::init(shared_ptr<Level> level, BomberGraphicsRenderer *renderer)
 {
+    _level = level;
     _sprite->init(renderer);
     _sprite->set_current_state("idle");
 }
@@ -26,21 +27,25 @@ bool Entity::move(Level* level, int x_offset, int y_offset)
 {
 
     BomberCoordinates next_coords(
-        (double) x_offset + (double)_sprite->get_coords().get_x(),
-        (double) y_offset + (double)_sprite->get_coords().get_y());
+        (double) x_offset + _sprite->get_coords().get_x(),
+        (double) y_offset + _sprite->get_coords().get_y());
+
+        cout << "OFFSET " << x_offset << "," << y_offset << endl;
+    cout << "Entity " << _sprite->get_coords().get_x() << "," << _sprite->get_coords().get_y() << endl;
+    cout << "Entity2 " << next_coords.get_x() << "," <<next_coords.get_y() << endl;
 
     BomberCoordinates x1_y1(
-        next_coords.get_x() -level->get_dimension().get_cell_width()/2 + _sprite->get_bounding_box()->get_x() + 2,
-        next_coords.get_y() -level->get_dimension().get_cell_height()/2 + _sprite->get_bounding_box()->get_y() + 2 );
+        next_coords.get_x() -level->get_dimension().get_cell_width()/2 + _sprite->get_bounding_box()->get_x() + EPSILON_COLLIDERS,
+        next_coords.get_y() -level->get_dimension().get_cell_height()/2 + _sprite->get_bounding_box()->get_y() + EPSILON_COLLIDERS);
     BomberCoordinates x2_y1(
-        next_coords.get_x() -level->get_dimension().get_cell_width()/2 + _sprite->get_bounding_box()->get_x() + _sprite->get_bounding_box()->get_width() -2, 
-        next_coords.get_y() -level->get_dimension().get_cell_height()/2+ _sprite->get_bounding_box()->get_y() + 2);
+        next_coords.get_x() -level->get_dimension().get_cell_width()/2 + _sprite->get_bounding_box()->get_x() + _sprite->get_bounding_box()->get_width() - EPSILON_COLLIDERS, 
+        next_coords.get_y() -level->get_dimension().get_cell_height()/2+ _sprite->get_bounding_box()->get_y() + EPSILON_COLLIDERS);
     BomberCoordinates x2_y2(
-        next_coords.get_x() -level->get_dimension().get_cell_width()/2 + _sprite->get_bounding_box()->get_x() + _sprite->get_bounding_box()->get_width() -2, 
-        next_coords.get_y() -level->get_dimension().get_cell_height()/2+ _sprite->get_bounding_box()->get_y() + _sprite->get_bounding_box()->get_height() -2);
+        next_coords.get_x() -level->get_dimension().get_cell_width()/2 + _sprite->get_bounding_box()->get_x() + _sprite->get_bounding_box()->get_width() - EPSILON_COLLIDERS, 
+        next_coords.get_y() -level->get_dimension().get_cell_height()/2+ _sprite->get_bounding_box()->get_y() + _sprite->get_bounding_box()->get_height() - EPSILON_COLLIDERS);
     BomberCoordinates x1_y2(
-        next_coords.get_x()-level->get_dimension().get_cell_width()/2+ _sprite->get_bounding_box()->get_x() + 2, 
-        next_coords.get_y() -level->get_dimension().get_cell_height()/2+ _sprite->get_bounding_box()->get_y() + _sprite->get_bounding_box()->get_height() -2) ;
+        next_coords.get_x()-level->get_dimension().get_cell_width()/2+ _sprite->get_bounding_box()->get_x() + EPSILON_COLLIDERS, 
+        next_coords.get_y() -level->get_dimension().get_cell_height()/2+ _sprite->get_bounding_box()->get_y() + _sprite->get_bounding_box()->get_height() - EPSILON_COLLIDERS);
 
     if (can_move(level, x1_y1) && can_move(level, x2_y1) && can_move(level, x2_y2) && can_move(level, x1_y2)) 
     {
@@ -52,6 +57,7 @@ bool Entity::move(Level* level, int x_offset, int y_offset)
 
 bool Entity::can_move(Level* level, const BomberCoordinates& coords) {
     auto grid_coords = level->get_grid_coords(coords);
+    cout << "GRID " << coords.get_x() << "," << coords.get_y() << endl;
     auto material = level->get_tile_material(grid_coords);
     cout << "(" << grid_coords.get_column() << "," << grid_coords.get_row() << "):" << (int)material << endl;
     return TTile_material::GROUND == material;

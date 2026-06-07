@@ -2,6 +2,7 @@
 
 #include "levels.h"
 #include "sprites.h"
+#include "bomber_object.h"
 #include "hero.h"
 #include "bomber_exceptions.h"
 #include "bomber_input.h"
@@ -18,7 +19,7 @@ public:
     World() : _sprites(nullptr), _levels(nullptr), _hero(nullptr), _selected_level(nullptr) {}
     ~World() {}
 
-    void load(shared_ptr<SpritesRepository> sprites, shared_ptr<LevelsRepository> levels);
+    void load(shared_ptr<SpritesRepository> sprites, shared_ptr<LevelsRepository> levels, shared_ptr<ObjectRepository> objects);
 
     void select_level(const string &name, BomberGraphicsRenderer *renderer);
 
@@ -33,6 +34,7 @@ public:
 private:
     shared_ptr<SpritesRepository> _sprites;
     shared_ptr<LevelsRepository> _levels;
+    shared_ptr<ObjectRepository> _objects;
     shared_ptr<Level> _selected_level;
     shared_ptr<MainHero> _hero;
     vector<shared_ptr<Hero>> _ennemies;

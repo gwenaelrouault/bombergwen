@@ -32,7 +32,8 @@ bool GameEngine::load()
         auto loaded_assets = _assets->load();
         auto sprites = ::get<0>(loaded_assets);
         auto levels = ::get<1>(loaded_assets);
-        _world->load(sprites, levels);
+        auto objects = ::get<2>(loaded_assets);
+        _world->load(sprites, levels, objects);
         BomberLogger::get_instance()->info("GAME:ENGINE:load - END");
         return true;
     }

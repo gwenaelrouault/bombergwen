@@ -33,6 +33,10 @@ vector<T_BomberKeyEvent> BomberInputManager::process_events()
             {
                 events.push_back(BOMBER_KEY_UP);
             }
+            else if (event.key.keysym.sym == SDLK_SPACE)
+            {
+                events.push_back(BOMBER_KEY_ACTION);
+            }
         } else if (event.type == SDL_KEYUP)
         {
             if (event.key.keysym.sym == SDLK_DOWN)

@@ -10,6 +10,7 @@
 #include "map_parser.h"
 #include "sprites.h"
 #include "levels.h"
+#include "bomber_object.h"
 #include "bomber_exceptions.h"
 
 using namespace std;
@@ -78,18 +79,20 @@ public:
             "../resources/bomber_tiles.json", 
             "../resources/bomber_tiles.png", 
             "../resources/level1.json");
+        _configuration_objects[BOMB1] =  tuple<string, string>("../resources/bomb1.json", "../resources/bomb1.png");
+        _configuration_objects[BOMB2] =  tuple<string, string>("../resources/bomb2.json", "../resources/bomb2.png");
     }
     ~GameAssets() {}
 
-    tuple<shared_ptr<SpritesRepository>, shared_ptr<LevelsRepository>> load();
+    tuple<shared_ptr<SpritesRepository>, shared_ptr<LevelsRepository>, shared_ptr<ObjectRepository>> load();
 
 private:
     map<string, tuple<string, string>> _configuration_sprites;
     map<string, tuple<string, string, string>> _configuration_levels;
+    map<string, tuple<string, string>> _configuration_objects;
     
     shared_ptr<SpritesRepository> load_sprites();
     shared_ptr<LevelsRepository> load_levels();
-
-
+    shared_ptr<ObjectRepository> load_objects();
 
 };

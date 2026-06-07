@@ -4,12 +4,7 @@
 #include "display_items.h"
 #include <vector>
 #include "bomber_logger.h"
-
-typedef enum {
-    DECO,
-    GROUND,
-    PLOT
-} TTile_material;
+#include "tiles.h"
 
 class GridCoordinates
 {
@@ -38,6 +33,9 @@ public:
 
     int get_cell_height() const { return _cell_height; }
 
+    int get_columns() const { return _columns; }
+    int get_rows() const { return _rows; }
+
     int get_width() const { return _cell_width * _columns; }
     int get_height() const { return _cell_height * _rows; }
 
@@ -57,51 +55,23 @@ public:
 
     shared_ptr<BomberImg> get_img() { return _img; }
     TTile_material get_material() { return _material; }
-    
+
 private:
     shared_ptr<BomberImg> _img;
     TTile_material _material;
 };
 
-class LevelTile
-{
-public:
-    LevelTile(shared_ptr<BomberImg> img, int grid_row, int grid_column, TTile_material material)
-        : _img(img), _row(grid_row), _column(grid_column), _texture(nullptr), _coords(grid_column * img->get_width(), grid_row * img->get_height()), _material(material)
-    {
-       // BomberLogger::get_instance()->info("PUT TILE(row={},colum,={}):{},{}", grid_row,grid_column,_x, _y);
-    }
-    ~LevelTile() {}
-
-    void load_texture(BomberGraphicsRenderer* renderer);
-
-    const BomberCoordinates& get_coords() const { return _coords; }
-
-    int get_mem_size() const { return _img != nullptr ? _img->size_bytes() : 0; }
-
-    BomberTexture* get_texture() { return _texture.get(); }
-
-    TTile_material get_material() const { return _material; }
-
-    void draw(BomberGraphicsRenderer *renderer);
-
-private:
-    shared_ptr<BomberImg> _img;
-    int _row;
-    int _column;
-    unique_ptr<BomberTexture> _texture;
-    BomberCoordinates _coords;
-    TTile_material _material;
-};
 
 class Level : public DisplayableItem
 {
 public:
+    Level(const Level &level);
     Level(const string &name,
           int cell_width, int cell_height,
           int columns, int rows,
           shared_ptr<BomberBBox> default_camera,
           const vector<shared_ptr<LevelCell>> &tiles);
+
     virtual ~Level();
 
     virtual void init(BomberGraphicsRenderer *renderer);
@@ -114,17 +84,19 @@ public:
 
     shared_ptr<BomberBBox> get_default_camera() { return _default_camera; }
 
-    BomberCoordinates get_tile_coords(const GridCoordinates& grid_coords);
+    BomberCoordinates get_tile_coords(const GridCoordinates &grid_coords);
 
-    GridCoordinates get_grid_coords(const BomberCoordinates& coords);
-    
-    const LevelDimensions& get_dimension() { return *_dimensions.get(); }
+    GridCoordinates get_grid_coords(const BomberCoordinates &coords);
 
-    bool is_inside(const BomberRect& rect);
+    const LevelDimensions &get_dimension() { return *_dimensions.get(); }
+
+    bool is_inside(const BomberRect &rect);
 
     int compute_size();
 
-    TTile_material get_tile_material(const GridCoordinates& grid_coords);
+    TTile_material get_tile_material(const GridCoordinates &grid_coords);
+
+    virtual shared_ptr<Level> clone();
 
 private:
     int _columns;
@@ -132,7 +104,7 @@ private:
     int _size;
     unique_ptr<LevelDimensions> _dimensions;
     shared_ptr<BomberBBox> _default_camera;
-    vector<unique_ptr<LevelTile>> _tiles;
+    vector<shared_ptr<LevelTile>> _tiles;
 };
 
 class LevelsRepository : public DisplayableItemsRepository<Level>

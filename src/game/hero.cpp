@@ -142,17 +142,17 @@ THeroState HeroStateDie::get_next_state(TEntityEvent evt)
     return get_id();
 }
 
-Hero::Hero(shared_ptr<SpritesRepository> sprites, const string &name) : _current_state(THeroState::STATE_IDLE_DOWN), Entity(name, sprites, 2)
+Hero::Hero(shared_ptr<SpritesRepository> sprites, const string &name) : _current_state(THeroState::STATE_IDLE_DOWN), Entity(name, sprites)
 {
-    auto idle_up_state = make_unique<HeroStateIdleUp>();
-    auto idle_down_state = make_unique<HeroStateIdleDown>();
-    auto idle_right_state = make_unique<HeroStateIdleRight>();
-    auto idle_left_state = make_unique<HeroStateIdleLeft>();
-    auto walk_up_state = make_unique<HeroStateWalkUp>();
-    auto walk_down_state = make_unique<HeroStateWalkDown>();
-    auto walk_right_state = make_unique<HeroStateWalkRight>();
-    auto walk_left_state = make_unique<HeroStateWalkLeft>();
-    auto die_state = make_unique<HeroStateDie>();
+    auto idle_up_state = make_shared<HeroStateIdleUp>();
+    auto idle_down_state = make_shared<HeroStateIdleDown>();
+    auto idle_right_state = make_shared<HeroStateIdleRight>();
+    auto idle_left_state = make_shared<HeroStateIdleLeft>();
+    auto walk_up_state = make_shared<HeroStateWalkUp>();
+    auto walk_down_state = make_shared<HeroStateWalkDown>();
+    auto walk_right_state = make_shared<HeroStateWalkRight>();
+    auto walk_left_state = make_shared<HeroStateWalkLeft>();
+    auto die_state = make_shared<HeroStateDie>();
 
     _states.insert({idle_up_state->get_id(), ::move(idle_up_state)});
     _states.insert({idle_down_state->get_id(), ::move(idle_down_state)});
@@ -177,4 +177,15 @@ void Hero::on_event(TEntityEvent evt)
         _current_state = next_state_id;
         _velocity = _states[_current_state]->get_velocity();
     }
+    if (evt == TEntityEvent::ENTITY_ACTION)
+    {
+        put_bomb();
+    }
+}
+
+void Hero::put_bomb()
+{
+    auto current_grid_coords = _level->get_grid_coords(_sprite->get_coords());
+    
+
 }

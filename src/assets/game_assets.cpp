@@ -106,13 +106,14 @@ shared_ptr<Level> LevelGameAsset::load()
     return make_shared<Level>(level_map->get_name(), 32, 32, level_map->get_columns(), level_map->get_rows(), level_map->get_default_camera(), tiles);
 }
 
-tuple<shared_ptr<SpritesRepository>, shared_ptr<LevelsRepository>> GameAssets::load()
+tuple<shared_ptr<SpritesRepository>, shared_ptr<LevelsRepository>, shared_ptr<ObjectRepository>> GameAssets::load()
 {
     BomberLogger::get_instance()->info("GAME:ENGINE:ASSETS:load - START");
     auto sprites = load_sprites();
     auto levels = load_levels();
+    auto objects = load_objects();
     BomberLogger::get_instance()->info("GAME:ENGINE:ASSETS:load - END");
-    return make_tuple(sprites, levels);
+    return make_tuple(sprites, levels, objects);
 }
 
 shared_ptr<SpritesRepository> GameAssets::load_sprites()
@@ -149,4 +150,22 @@ shared_ptr<LevelsRepository> GameAssets::load_levels()
     }
     BomberLogger::get_instance()->info("GAME:ENGINE:ASSETS:LEVELS:load - END");
     return levels;
+}
+
+shared_ptr<ObjectRepository> GameAssets::load_objects()
+{
+    BomberLogger::get_instance()->info("GAME:ENGINE:ASSETS:OBJECTS:load - START");
+    auto objects = make_shared<ObjectRepository>();
+    map<string, shared_ptr<SpriteGameAsset>> sprite_assets;
+    for (auto it = _configuration_objects.begin(); it != _configuration_objects.end(); ++it)
+    {
+        sprite_assets[it->first] = make_shared<SpriteGameAsset>(it->first, ::get<0>(it->second), ::get<1>(it->second));
+    }
+    for (auto it = sprite_assets.begin(); it != sprite_assets.end(); ++it)
+    {
+        auto sprite = it->second->load();
+        objects->add(sprite->get_name(), sprite);
+    }
+    BomberLogger::get_instance()->info("GAME:ENGINE:ASSETS:OBJECTS:load - END");
+    return objects;
 }
