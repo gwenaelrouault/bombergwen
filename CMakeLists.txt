@@ -43,6 +43,7 @@ add_executable(${PROJECT_NAME}
     src/game/game_engine.cpp
     src/game/world.cpp
     src/game/hero.cpp
+    src/game/bomb.cpp
     src/desktop.cpp
 )
 

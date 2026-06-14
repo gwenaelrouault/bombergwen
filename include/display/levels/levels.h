@@ -16,6 +16,11 @@ public:
 
     int get_column() const { return _column; }
 
+
+     bool operator==(const GridCoordinates& other) const {
+        return _row == other._row && _column == other._column;
+    }
+
 private:
     int _row;
     int _column;

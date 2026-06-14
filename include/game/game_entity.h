@@ -22,7 +22,7 @@ class Entity
 {
 public:
     Entity(const string &name, shared_ptr<SpritesRepository> sprites)
-        : _sprite(sprites->get_copy(name)),  _velocity({0,0}), _level(nullptr) {}
+        : _name(name), _sprite(sprites->get_copy(name)),  _velocity({0,0}), _level(nullptr) {}
     virtual ~Entity() {}
 
     virtual void init(shared_ptr<Level> level, BomberGraphicsRenderer *renderer);
@@ -38,9 +38,12 @@ public:
 
     const BomberCoordinates & get_position() { return _sprite->get_coords(); }
 
+    const string& get_name() const { return _name; }
+
     bool has_speed();
 
 protected:
+    string _name;
     shared_ptr<Sprite> _sprite;
     TEntityVelocity _velocity;
     shared_ptr<Level> _level;

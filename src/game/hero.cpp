@@ -142,7 +142,8 @@ THeroState HeroStateDie::get_next_state(TEntityEvent evt)
     return get_id();
 }
 
-Hero::Hero(shared_ptr<SpritesRepository> sprites, const string &name) : _current_state(THeroState::STATE_IDLE_DOWN), Entity(name, sprites)
+Hero::Hero(shared_ptr<SpritesRepository> sprites, const string &name, shared_ptr<BombFactory> bomb_factory) 
+    : _bomb_factory(bomb_factory), _current_state(THeroState::STATE_IDLE_DOWN), Entity(name, sprites)
 {
     auto idle_up_state = make_shared<HeroStateIdleUp>();
     auto idle_down_state = make_shared<HeroStateIdleDown>();
@@ -167,7 +168,7 @@ Hero::Hero(shared_ptr<SpritesRepository> sprites, const string &name) : _current
     _states.insert({die_state->get_id(), ::move(die_state)});
 }
 
-void Hero::on_event(TEntityEvent evt)
+void Hero::on_event(TEntityEvent evt, vector<shared_ptr<Bomb>>& bombs)
 {
     auto next_state_id = _states[_current_state]->get_next_state(evt);
     if (next_state_id != _current_state)
@@ -179,13 +180,28 @@ void Hero::on_event(TEntityEvent evt)
     }
     if (evt == TEntityEvent::ENTITY_ACTION)
     {
-        put_bomb();
+        put_bomb(bombs);
     }
 }
 
-void Hero::put_bomb()
+void Hero::put_bomb(vector<shared_ptr<Bomb>>& bombs)
 {
     auto current_grid_coords = _level->get_grid_coords(_sprite->get_coords());
-    
+    BomberLogger::get_instance()->info("GAME:ENGINE:HERO:{}:put_bomb({},{})", get_name(), current_grid_coords.get_column(), current_grid_coords.get_row());
+    bool found_existing_bomb = false;
+    for(auto bomb : bombs)
+    {
+        auto bomb_grid_coord = _level->get_grid_coords(bomb->get_position());
+        if (bomb_grid_coord == current_grid_coords)
+        {
+            found_existing_bomb = true;
+        }
+    }
+    if (!found_existing_bomb)
+    {
+        auto bomb_coord = _level->get_tile_coords(current_grid_coords);
+        auto new_bomb = _bomb_factory->build_bomb(bomb_coord);
+        bombs.push_back(new_bomb);
+    }
 
 }

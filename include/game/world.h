@@ -6,6 +6,7 @@
 #include "hero.h"
 #include "bomber_exceptions.h"
 #include "bomber_input.h"
+#include "bomb.h"
 
 class NoLevelException : public BomberException
 {
@@ -39,4 +40,5 @@ private:
     shared_ptr<MainHero> _hero;
     vector<shared_ptr<Hero>> _ennemies;
     vector<shared_ptr<Entity>> _entities;
+    vector<shared_ptr<Bomb>> _bombs;
 };

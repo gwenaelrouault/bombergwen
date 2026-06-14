@@ -9,7 +9,8 @@ void World::load(shared_ptr<SpritesRepository> sprites, shared_ptr<LevelsReposit
     _sprites = sprites;
     _levels = levels;
     _objects = objects;
-    _hero = make_shared<MainHero>(sprites, NAME_HERO);
+    auto bomb_factory = make_shared<BombFactory>(objects);
+    _hero = make_shared<MainHero>(sprites, NAME_HERO, bomb_factory);
     _entities.push_back(_hero);
     BomberLogger::get_instance()->info("GAME:ENGINE:WORLD:load - END");
 }
@@ -85,31 +86,31 @@ void World::on_event(T_BomberKeyEvent event)
     switch (event)
     {
     case T_BomberKeyEvent::BOMBER_KEY_DOWN:
-        _hero->on_event(TEntityEvent::ENTITY_DOWN);
+        _hero->on_event(TEntityEvent::ENTITY_DOWN, _bombs);
         break;
     case T_BomberKeyEvent::BOMBER_KEY_LEFT:
-        _hero->on_event(TEntityEvent::ENTITY_LEFT);
+        _hero->on_event(TEntityEvent::ENTITY_LEFT, _bombs);
         break;
     case T_BomberKeyEvent::BOMBER_KEY_RIGHT:
-        _hero->on_event(TEntityEvent::ENTITY_RIGHT);
+        _hero->on_event(TEntityEvent::ENTITY_RIGHT, _bombs);
         break;
     case T_BomberKeyEvent::BOMBER_KEY_UP:
-        _hero->on_event(TEntityEvent::ENTITY_UP);
+        _hero->on_event(TEntityEvent::ENTITY_UP, _bombs);
         break;
     case T_BomberKeyEvent::BOMBER_KEY_DOWN_CANCEL:
-        _hero->on_event(TEntityEvent::ENTITY_DOWN_CANCEL);
+        _hero->on_event(TEntityEvent::ENTITY_DOWN_CANCEL, _bombs);
         break;
     case T_BomberKeyEvent::BOMBER_KEY_LEFT_CANCEL:
-        _hero->on_event(TEntityEvent::ENTITY_LEFT_CANCEL);
+        _hero->on_event(TEntityEvent::ENTITY_LEFT_CANCEL, _bombs);
         break;
     case T_BomberKeyEvent::BOMBER_KEY_RIGHT_CANCEL:
-        _hero->on_event(TEntityEvent::ENTITY_RIGHT_CANCEL);
+        _hero->on_event(TEntityEvent::ENTITY_RIGHT_CANCEL, _bombs);
         break;
     case T_BomberKeyEvent::BOMBER_KEY_UP_CANCEL:
-        _hero->on_event(TEntityEvent::ENTITY_UP_CANCEL);
+        _hero->on_event(TEntityEvent::ENTITY_UP_CANCEL, _bombs);
         break;
    case T_BomberKeyEvent::BOMBER_KEY_ACTION:
-        _hero->on_event(TEntityEvent::ENTITY_ACTION);
+        _hero->on_event(TEntityEvent::ENTITY_ACTION, _bombs);
         break; 
     
     default:

@@ -2,10 +2,10 @@
 
 #include "sprites.h"
 
-class ObjectRepository : public DisplayableItemsRepository<Sprite>
+class ObjectRepository : public SpritesRepository
 {
 public:
-    ObjectRepository() : DisplayableItemsRepository<Sprite>() {}
+    ObjectRepository() : SpritesRepository() {}
     ~ObjectRepository() {}
 
     virtual void dump();

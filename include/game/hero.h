@@ -1,6 +1,7 @@
 #pragma once
 
 #include "game_entity.h"
+#include "bomb.h"
 
 
 #define STATE_DIE_NAME "DIE"
@@ -125,16 +126,17 @@ public:
 class Hero : public Entity
 {
 public:
-    Hero(shared_ptr<SpritesRepository> sprites, const string& name);
+    Hero(shared_ptr<SpritesRepository> sprites, const string& name, shared_ptr<BombFactory> bomb_factory);
     virtual ~Hero() {}
 
     THeroState get_current_state() const { return _current_state; }
 
-    void on_event(TEntityEvent evt);
+    void on_event(TEntityEvent evt, vector<shared_ptr<Bomb>>& bombs);
 
-    void put_bomb();
+    void put_bomb(vector<shared_ptr<Bomb>>& bombs);
 
 private:
+    shared_ptr<BombFactory> _bomb_factory;
     THeroState _current_state;
     map<THeroState, shared_ptr<HeroState>> _states;
 };
@@ -142,7 +144,7 @@ private:
 class MainHero : public Hero
 {
 public:
-    MainHero(shared_ptr<SpritesRepository> sprites, const string& name) : Hero(sprites, name) {}
+    MainHero(shared_ptr<SpritesRepository> sprites, const string& name, shared_ptr<BombFactory> bomb_factory) : Hero(sprites, name, bomb_factory) {}
     virtual ~MainHero() {}
 
 };
